@@ -22,7 +22,7 @@ namespace Luxi
             foreach (var i in OtherCycles)
                 Count /= i;
             foreach (var i in OtherCycles.GroupBy(x => x))
-                Count /= FactI(i.Count());
+                Count /= FactI128(i.Count());
         }
         public Wing GetInstance(int Buffer=0)
         {
