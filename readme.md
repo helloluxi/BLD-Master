@@ -1,29 +1,10 @@
 # BLD-Master
 
-A customizable Rubik's Cube (333 & 444) blindfolded scramble generator.
+> **Warning:** This repository is no longer maintained. Please use [3BLD Stat Tools](https://github.com/helloluxi/bld-stat) and [3BLD Scrambler](https://github.com/helloluxi/bld-scr).
 
-The difficulty of a 3bf/4bf scramble is sufficiently determined by its conjugacy class.
-We first present the following definition:
-+ The *orientation* (**ori**) of an edge/corner: for each of the 12 physical edges, we define its characteristic face as UF, UR, UB, UL, DF, DR, DB, DL, FR, FL, BR, BL, respectively. The orientation of an edge is defined as the number of clockwise rotations from the characteristic face of its current position to its physical characteristic face, thus the ori takes values in $\mathbb{Z}_2$. For corners, the characteristic face are UFL, UBL, UBR, UFR, DFL, DBL, DBR, DFR, resp., and the ori takes values in $\mathbb{Z}_3$. For a valid 3bf/4bf state, the ori sum of all edges/corners is 0. The wings/x-centers of 4bf have no ori.
-+ The $(j,k)$-cycle: A cycle is defined as a sequence of edges/corners $\{e_1, e_2, \cdots, e_j\}$ such that the physical piece $e_{(i+1)\text{mod }j}$ is at the position of $e_i$ for $i=1,2,\cdots,j$. The cycle is called a $(j,k)$-cycle if it contains $j$ pieces and the ori sum is $k$ (don't forget to take modulo over 2 or 3, for edge/corner resp.). For complicity of representation, we define pieces already on its position as a $(1,ori)$-cycle. A $(1,1)$-cycle of edges is called a *flip*, and a $(1,1)$/$(1,2)$-cycle of corners is called a *twist*.
-+ A $(j,0)$-cycle is also called a closed $j$-cycle, and a $(j,k)$-cycle with $k\neq0$ is also called an open $j$-cycle. A closed $(2k+1)$-cycle ($k\geq 1$) can be decomposed into $k$ closed 3-cycles, thus can be solved individually.
-+ The *conjugacy class* (**cc**): In group theory, two elements $a,b\in G$ are conjugate if there exists an element $g\in G$ such that $g^{-1}ag=b$, and the maximal set of elements conjugate to each other are called a conjugacy class. In the context of Rubik's Cube, a conjugacy class is completely determined by all its cycles $(j_i, k_i)$. It's quite obvious, as $g$ is known as *set up* in the bf community, which acts on closed 3-cycles $a$ as another closed 3-cycle.
-+ The parity of a cycle/conjugacy class: odd-cycles have parity 0 and they can be solved purely by 3-cycles, while even-cycles have parity 1 and they can be solved by 3-cycles plus one 2-cycle. The parity of a conjugacy class is the parity sum of its cycles. For a valid 3bf state, the edge parity is always equal to the corner parity. For 4bf, the parity of wings, corners and x-centers are independent.
+## Example Usage
 
-For common 3bf/4bf players, they use one buffer to implement 3-cycles, so the cycle containing the buffer should have a special treatment, and we call it the first cycle.
-Thus, in the context of this program, the conjugacy class is determined by the first cycle parameters $(perm, ori)$ and an ordered list of other cycle parameters.
-The code length is defined as `OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : x.ori * 2) + FirstCycle.perm - 1`.
-The related classes are called `EdgeCC`, `CornerCC`, `WingCC` and `XCenterCC` respectively.
-At present the `XCenterCC` is not implemented and only support scrambled/unscrambled.
-
-All possible classes are stored in the text files in the `Cache` folder, in the format `firstCycleLength, firstCycleOri, secondCycleLength, secondCycleOri, ...`.
-As an example, the first line in `ee.txt` (even edge), i.e. `11,1,1,1`, means the cycle containing buffer is a 11-cycle with ori sum being 1, and the remain edge is flipped.
-The other cache files are: `oe.txt` (odd edge), `ec.txt` (even corner), `oc.txt` (odd corner), `w.txt` (wing).
-
-This program can generate scrambles with custom constraints for the conjugacy class, where the constraints are defined in `Cube3Class` and `Cube4Class`.
-A `Cube3Class` contains a `Predicate<EdgeCC>` for edge conjugacy class constraint, a `Predicate<CornerCC>` for corner conjugacy class constraint and a `Predicate<int>` for parity constraint.
-Many examples are shown in `Program.cs`.
-An example for generating 10 3bf scrambles with edge code length 10 or 11 and corner code length 6 or 7 without flip or twist is:
+3x3x3 cube
 
 ```csharp
 var cc = new Cube3Class{
@@ -53,8 +34,8 @@ for (int i = 0; i < 10; i++)
 }
 ```
 
-A `Cube4Class` contains a `Predicate<WingCC>`, a `Predicate<CornerCC>` and a `bool` for whether to scramble x-centers.
-An example for generating a 4bf scramble with wing code length 24 without scrambling corners or x-centers is:
+4x4x4 cube
+
 
 ```csharp
 var cc = new Cube4Class{
@@ -70,11 +51,7 @@ Console.WriteLine(cube.GetScramble());
 // R'  U'  B2  D'  B2  R2  D'  R2  U'  R2  U   B'  L'  F2  R'  B'  U'  D'  F   L2  Rw2 Fw2 D2  B'  Uw2 D   F   D2  U   Fw2 U2  F   L   Uw2 U2  F'  Uw2 x2
 ```
 
-To use the program well, it's best to customize your need in `Program.cs` by yourself.
-
-## Some statistic results (todo: move to another repo)
-
-Most are migrated to another [repo](https://github.com/helloluxi/bld-stat).
+## Some statistic results which I just put here but I have lost their source code
 
 ### The distribution of the order of Rubik's cube group elements
 
@@ -232,7 +209,6 @@ Sum = 490497638400 = $2^{10}\times 12!$
 
 ## Acknowledgements
 
-+ Thank github copilot, without which a lazy boy like me may never write this readme.
 + Many thanks to [Chen Shuang](https://github.com/cs0x7f/min2phase) for the [min2phase](https://github.com/cs0x7f/min2phase) algorithm for solving 333 cube and [TPR-4x4x4-Solver](https://github.com/cs0x7f/TPR-4x4x4-Solver) for solving 444 cube, which I brute-forcely modified to C# in this project.
 
 ## License GPL-3.0
