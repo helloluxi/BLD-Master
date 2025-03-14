@@ -7,22 +7,57 @@ namespace Luxi
         public readonly State[] OtherCycles;
         private const int _Perm = 8, _Ori = 3;
         public const long Sum = 88179840;
-        public readonly int CodeLength, OtherCycleCount, TwistCount, Parity;
+        public readonly int Algx2, Cycles, Parity, Float1, Bad1, Float2, Bad2, Float3, Bad3, Float4, Bad4, Float5, Bad5;
         public readonly int Count;
         public CornerCC(int FirstCycle, State[] OtherCycles)
         {
             this.FirstCycle = (FirstCycle, (_Perm * _Ori - OtherCycles.Sum(x => x.ori)) % _Ori);
             this.OtherCycles = OtherCycles;
-            CodeLength = OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : x.ori > 0 ? 2 : 0) + FirstCycle - 1;
-            OtherCycleCount = OtherCycles.Count(x => x.perm != 1);
-            Parity = CodeLength & 1;
-            TwistCount = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
+            int baseAlgs = OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : 0) + FirstCycle - 1;
+            Parity = baseAlgs & 1;
+            int twistAlgs = 0;
+            var twistOris = OtherCycles.Where(cycle => cycle.perm == 1 && cycle.ori != 0).Select(cycle => cycle.ori).ToList();
+            for (int i = 0; i < twistOris.Count - 2; i++)
+            {
+                if (twistOris[i] == twistOris[i + 1] && twistOris[i] == twistOris[i + 2])
+                {
+                    twistOris.RemoveRange(i, 3);
+                    twistAlgs++;
+                    i--;
+                }
+            }
+            for (int i = 0; i < twistOris.Count - 1; i++)
+            {
+                if (twistOris[i] != twistOris[i + 1])
+                {
+                    twistOris.RemoveRange(i, 2);
+                    twistAlgs++;
+                    i--;
+                }
+            }
+            if (twistOris.Count > 0)
+            {
+                twistAlgs++;
+            }
+            Cycles = OtherCycles.Count(x => x.perm != 1);
+            Float1 = OtherCycles.Count(x => x.perm == 1 && x.ori == 0);
+            Bad1 = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
+            Float2 = OtherCycles.Count(x => x.perm == 2 && x.ori == 0);
+            Bad2 = OtherCycles.Count(x => x.perm == 2 && x.ori > 0);
+            Float3 = OtherCycles.Count(x => x.perm == 3 && x.ori == 0);
+            Bad3 = OtherCycles.Count(x => x.perm == 3 && x.ori > 0);
+            Float4 = OtherCycles.Count(x => x.perm == 4 && x.ori == 0);
+            Bad4 = OtherCycles.Count(x => x.perm == 4 && x.ori > 0);
+            Float5 = OtherCycles.Count(x => x.perm == 5 && x.ori == 0);
+            Bad5 = OtherCycles.Count(x => x.perm == 5 && x.ori > 0);
+            Bad1 = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
             Count = FactI[_Perm - 1];
             foreach (var i in OtherCycles)
                 Count /= i.perm;
             Count *= Pow3[_Perm - 1 - OtherCycles.Length];
             foreach (var i in OtherCycles.GroupBy(x => x))
                 Count /= FactI[i.Count()];
+            Algx2 = baseAlgs + (twistAlgs - Float3) * 2;
         }
         public Corner GetInstance(int Buffer=3)
         {

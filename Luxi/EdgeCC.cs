@@ -8,23 +8,34 @@ namespace Luxi
         public readonly State[] OtherCycles;
         private const int _Perm = 12, _Ori = 2;
         public const long Sum = 980995276800;
-        public readonly int CodeLength, OtherCycleCount, FlipCount, Parity;
+        public readonly int Algx2, Cycles, Parity, Float1, Bad1, Float2, Bad2, Float3, Bad3, Float4, Bad4, Float5, Bad5;
         public readonly long Count;
 
         public EdgeCC(int FirstCycleLength, State[] OtherCycles)
         {
             this.FirstCycle = (FirstCycleLength, (_Perm * _Ori - OtherCycles.Sum(x => x.ori)) % _Ori);
             this.OtherCycles = OtherCycles;
-            CodeLength = OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : x.ori * 2) + FirstCycleLength - 1;
-            OtherCycleCount = OtherCycles.Count(x => x.perm != 1);
-            Parity = CodeLength & 1;
-            FlipCount = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
+            int baseAlgs = OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : 0) + FirstCycleLength - 1;
+            int twistAlgs = (OtherCycles.Count(x => x.perm == 1 && x.ori != 0) + 3) >> 2;
+            Parity = baseAlgs & 1;
+            Cycles = OtherCycles.Count(x => x.perm != 1);
+            Float1 = OtherCycles.Count(x => x.perm == 1 && x.ori == 0);
+            Bad1 = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
+            Float2 = OtherCycles.Count(x => x.perm == 2 && x.ori == 0);
+            Bad2 = OtherCycles.Count(x => x.perm == 2 && x.ori > 0);
+            Float3 = OtherCycles.Count(x => x.perm == 3 && x.ori == 0);
+            Bad3 = OtherCycles.Count(x => x.perm == 3 && x.ori > 0);
+            Float4 = OtherCycles.Count(x => x.perm == 4 && x.ori == 0);
+            Bad4 = OtherCycles.Count(x => x.perm == 4 && x.ori > 0);
+            Float5 = OtherCycles.Count(x => x.perm == 5 && x.ori == 0);
+            Bad5 = OtherCycles.Count(x => x.perm == 5 && x.ori > 0);
             Count = FactI64[_Perm - 1];
             foreach (var i in OtherCycles)
                 Count /= i.perm;
             Count *= 1L << (_Perm - 1 - OtherCycles.Length);
             foreach (var i in OtherCycles.GroupBy(x => x))
                 Count /= FactI64[i.Count()];
+            Algx2 = baseAlgs + (twistAlgs - Float3) * 2;
         }
         public Edge GetInstance(int Buffer=0)
         {
