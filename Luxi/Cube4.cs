@@ -123,6 +123,10 @@ namespace Luxi
                 default: break;
             }
         }
+        public void Cycle(string wcCode){
+            wing.Cycle(wcCode);
+            corner.Cycle(wcCode);
+        }
         public void Solve()
         {
             corner.Solve();

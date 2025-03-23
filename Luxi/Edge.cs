@@ -109,30 +109,36 @@ namespace Luxi
                 }
             }
         }
-        public string ReadCode(int Buffer=0){
+        public string ReadCode(int Buffer=0, bool flipSign=true, bool presOri=true){
             System.Text.StringBuilder sb = new();
-            int flag = 0xfff;
-            flag &= ~(1 << Buffer);
+            int remainBlocks = 0xfff;
+            remainBlocks &= ~(1 << Buffer);
+            // Remove solved blocks
             for (int i = 0; i < 12; i++)
                 if (state[i].perm == i && state[i].ori == 0)
-                    flag &= ~(1 << i);
+                    remainBlocks &= ~(1 << i);
             State head = (Buffer, 0);
             while(true){
                 var next = this[head];
+                // Append cycle middle to code
                 while (next.perm != head.perm){
                     sb.Append(Code[next.perm * 2 + next.ori]);
-                    flag &= ~(1 << next.perm);
+                    remainBlocks &= ~(1 << next.perm);
                     next = this[next];
                 }
-                if (next.perm != Buffer)
-                    sb.Append(Code[next.perm * 2 + next.ori]);
-                if(flag == 0)
+                // Append cycle end to code
+                if (next.perm != Buffer){
+                    sb.Append(flipSign && state[next.perm].perm == next.perm ? '+' : Code[next.perm * 2 + next.ori]);
+                }
+                if(remainBlocks == 0)
                     break;
+                // Find the next unsolved block
                 head.perm = 0;
-                head.ori = next.ori;
-                while(((flag >> head.perm) & 1) == 0)
+                head.ori = presOri ? next.ori : 0;
+                while(((remainBlocks >> head.perm) & 1) == 0)
                     ++head.perm;
-                flag &= ~(1 << head.perm);
+                remainBlocks &= ~(1 << head.perm);
+                // Append cycle head to code
                 sb.Append(Code[head.perm * 2 + head.ori]);
             }
             return sb.ToString();

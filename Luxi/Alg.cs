@@ -53,13 +53,13 @@ namespace Luxi
                 int colonIdx = s.IndexOf(':');
                 var pre = Parse(s[..colonIdx]);
                 var core = Parse(s[(colonIdx+1)..]);
-                return pre + core + pre.Reverse();
+                return pre + core + pre.GetInv();
             }
             else if (s.Contains('[')) { // No support of stack
                 int commaIdx = s.IndexOf(',');
                 var a = Parse(s[(s.IndexOf('[')+1)..commaIdx]);
                 var b = Parse(s[(commaIdx+1)..s.LastIndexOf(']')]);
-                return a + b + a.Reverse() + b.Reverse();
+                return a + b + a.GetInv() + b.GetInv();
             }
             else if (s.Contains(")2")){
                 var a = Parse(s[(s.IndexOf('(')+1)..s.LastIndexOf(")2")]);
@@ -70,7 +70,7 @@ namespace Luxi
         public static Move Inv(Move m){
             return (Move)((int)m + ((int)m % 3 == 0 ? 2 : (int)m % 3 == 2 ? -2 : 0));
         }
-        public new Alg Reverse(){
+        public Alg GetInv(){
             Alg alg = [];
             for (int i = Count - 1; i >= 0; i--)
                 alg.Add(Inv(this[i]));
@@ -82,6 +82,16 @@ namespace Luxi
             for (int i = 0; i < Count; i++)
                 strings[i] = this[i].ToString().TrimStart('_').Replace('_', '\'');
             return string.Join(" ", strings);
+        }
+        public Alg Shift(int n){
+            Alg alg = [];
+            for (int i = 0; i < Count; i++)
+                alg.Add(this[(i + n + Count) % Count]);
+            return alg;
+        }
+        public IEnumerable<Alg> Shifts(){
+            for (int i = 0; i < Count; i++)
+                yield return Shift(i);
         }
     }
 }

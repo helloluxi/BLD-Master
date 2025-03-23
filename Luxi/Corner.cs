@@ -64,18 +64,18 @@ namespace Luxi
                 case D: Cycle4(4, 7, 6, 5, 0); break;
                 case D2: Swap(4, 6); Swap(7, 5); break;
                 case D_: Cycle4(4, 5, 6, 7, 0); break;
-                case R: Cycle4(3, 2, 6, 7, 1); break;
-                case R2: Swap(3, 6); Swap(2, 7); break;
-                case R_: Cycle4(3, 7, 6, 2, 1); break;
-                case L: Cycle4(0, 4, 5, 1, 2); break;
-                case L2: Swap(0, 5); Swap(4, 1); break;
-                case L_: Cycle4(0, 1, 5, 4, 2); break;
-                case F: Cycle4(0, 3, 7, 4, 1); break;
-                case F2: Swap(0, 7); Swap(3, 4); break;
-                case F_: Cycle4(0, 4, 7, 3, 1); break;
-                case B: Cycle4(1, 5, 6, 2, 2); break;
-                case B2: Swap(1, 6); Swap(5, 2); break;
-                case B_: Cycle4(1, 2, 6, 5, 2); break;
+                case R: Cycle4(0, 3, 6, 7, 1); break;
+                case R2: Swap(0, 6); Swap(3, 7); break;
+                case R_: Cycle4(0, 7, 6, 3, 1); break;
+                case L: Cycle4(1, 4, 5, 2, 2); break;
+                case L2: Swap(1, 5); Swap(4, 2); break;
+                case L_: Cycle4(1, 2, 5, 4, 2); break;
+                case F: Cycle4(1, 0, 7, 4, 1); break;
+                case F2: Swap(1, 7); Swap(0, 4); break;
+                case F_: Cycle4(1, 4, 7, 0, 1); break;
+                case B: Cycle4(2, 5, 6, 3, 2); break;
+                case B2: Swap(2, 6); Swap(5, 3); break;
+                case B_: Cycle4(2, 3, 6, 5, 2); break;
                 case x: Turn(R); Turn(L_); Turn(M_); break;
                 case x2: Turn(R2); Turn(L2); Turn(M2); break;
                 case x_: Turn(R_); Turn(L); Turn(M); break;
@@ -89,8 +89,8 @@ namespace Luxi
             }
         }
 
-        public const string Code = "chtedwgfzabqilsknxmpyojr";
-        public void Cycle(string code, int Buffer=3){
+        public const string Code = "ahqcbtedwgfzilsknxmpyojr";
+        public void Cycle(string code, int Buffer=0){
             foreach (char c in code)
             {
                 int idx = Code.IndexOf(c);
@@ -99,30 +99,36 @@ namespace Luxi
                 }
             }
         }
-        public string ReadCode(int Buffer=3){
+        public string ReadCode(int Buffer=0, bool twistSign=true, bool presOri=false){
             System.Text.StringBuilder sb = new();
-            int flag = 0xff;
-            flag &= ~(1 << Buffer);
+            int remainBlocks = 0xff;
+            remainBlocks &= ~(1 << Buffer);
+            // Remove solved blocks
             for (int i = 0; i < 8; i++)
                 if (state[i].perm == i && state[i].ori == 0)
-                    flag &= ~(1 << i);
+                    remainBlocks &= ~(1 << i);
             State head = (Buffer, 0);
             while(true){
                 var next = this[head];
+                // Append cycle middle to code
                 while (next.perm != head.perm){
                     sb.Append(Code[next.perm * 3 + next.ori]);
-                    flag &= ~(1 << next.perm);
+                    remainBlocks &= ~(1 << next.perm);
                     next = this[next];
                 }
-                if (next.perm != Buffer)
-                    sb.Append(Code[next.perm * 3 + next.ori]);
-                if(flag == 0)
+                // Append cycle end to code
+                if (next.perm != Buffer){
+                    sb.Append(twistSign && state[next.perm].perm == next.perm ? "+-"[state[head.perm].ori-1] : Code[next.perm * 3 + next.ori]);
+                }
+                if(remainBlocks == 0)
                     break;
+                // Find the next unsolved block
                 head.perm = 0;
-                head.ori = next.ori;
-                while(((flag >> head.perm) & 1) == 0)
+                head.ori = presOri ? next.ori : 0;
+                while(((remainBlocks >> head.perm) & 1) == 0)
                     ++head.perm;
-                flag &= ~(1 << head.perm);
+                remainBlocks &= ~(1 << head.perm);
+                // Append cycle head to code
                 sb.Append(Code[head.perm * 3 + head.ori]);
             }
             return sb.ToString();

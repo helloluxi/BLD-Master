@@ -27,12 +27,16 @@ namespace Luxi
             state[p2] = state[p1];
             state[p1] = t;
         }
-        public void Swap(int p0, int p1)
-        {
-            int t = state[p0];
-            state[p0] = state[p1];
-            state[p1] = t;
+        public void Cycle(string bfCode){
+            foreach (char c in bfCode)
+            {
+                int idx = Edge.Code.IndexOf(c);
+                if (idx > 0){
+                    Swap(0, idx);
+                }
+            }
         }
+        public void Swap(int p0, int p1) => (state[p1], state[p0]) = (state[p0], state[p1]);
         public static Wing Random()
         {
             int[] arr = new int[24];
