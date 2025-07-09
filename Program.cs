@@ -5,7 +5,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        // var baseAlg = new Alg("Rw2B2Rw'U2Rw'U2/B2Rw'B2RwB2Rw'B2Rw2B2/U2");
+        // var baseAlg = new Alg("Rw2B2Rw'U2Rw'U2B2Rw'B2RwB2Rw'B2Rw2B2U2");
         // foreach(var alg in baseAlg.Shifts().Skip(1)){
         //     var cube = new Cube4();
         //     cube.Turn(alg.GetInv());
