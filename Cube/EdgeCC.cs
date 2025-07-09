@@ -100,52 +100,20 @@ public class EdgeCC
     {
         OddList = [];
         EvenList = [];
-        if (File.Exists("Cache/oe.txt") && File.Exists("Cache/ee.txt"))
+        List<int> temp = [];
+        foreach (var s in GeneratePerm(12))
         {
-            foreach (var s in File.ReadAllLines("Cache/oe.txt"))
+            int p = 0;
+            for (int i = 0; i < s.Length; i++)
             {
-                var t = s.Split(',').Select(int.Parse).ToArray();
-                State[] OtherCycles = new State[(t.Length - 2) / 2];
-                for (int i = 0; i < OtherCycles.Length; i++)
-                    OtherCycles[i] = (t[i * 2 + 2], t[i * 2 + 3]);
-                OddList.Add(new EdgeCC(t[0], OtherCycles));
-            }
-            foreach (var s in File.ReadAllLines("Cache/ee.txt"))
-            {
-                var t = s.Split(',').Select(int.Parse).ToArray();
-                State[] OtherCycles = new State[(t.Length - 2) / 2];
-                for (int i = 0; i < OtherCycles.Length; i++)
-                    OtherCycles[i] = (t[i * 2 + 2], t[i * 2 + 3]);
-                EvenList.Add(new EdgeCC(t[0], OtherCycles));
-            }
-        }
-        else{
-            List<int> temp = [];
-            foreach (var s in GeneratePerm(12))
-            {
-                int p = 0;
-                for (int i = 0; i < s.Length; i++)
+                if (s[i] != p)
                 {
-                    if (s[i] != p)
-                    {
-                        p = s[i];
-                        temp.Add(i);
-                    }
+                    p = s[i];
+                    temp.Add(i);
                 }
-                GenerateOri(0, s, new int[s.Length], temp);
-                temp.Clear();
             }
-            Directory.CreateDirectory("Cache");
-            File.WriteAllLines("Cache/oe.txt",
-                OddList.Select(x => string.Join(",", Enumerable.Concat(
-                    [x.FirstCycle.perm, x.FirstCycle.ori],
-                    x.OtherCycles.SelectMany(y => new int[] { y.perm, y.ori })))
-            ));
-            File.WriteAllLines("Cache/ee.txt",
-                EvenList.Select(x => string.Join(",", Enumerable.Concat(
-                    [x.FirstCycle.perm, x.FirstCycle.ori],
-                    x.OtherCycles.SelectMany(y => new int[] { y.perm, y.ori })))
-            ));
+            GenerateOri(0, s, new int[s.Length], temp);
+            temp.Clear();
         }
     }
 #endregion
