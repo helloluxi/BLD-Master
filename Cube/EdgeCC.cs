@@ -3,21 +3,22 @@ using static Cube.Tools;
 namespace Cube;
 public class EdgeCC
 {
-    public readonly State FirstCycle;
-    public readonly State[] OtherCycles;
+    public readonly CycleConfig FirstCycle;
+    public readonly CycleConfig[] OtherCycles;
     private const int _Perm = 12, _Ori = 2;
     public const long Sum = 980995276800;
-    public readonly int Algx2, Cycles, Parity, Float1, Bad1, Float2, Bad2, Float3, Bad3, Float4, Bad4, Float5, Bad5;
+    public readonly int Algx2, Breaks, Parity, Float1, Bad1, Float2, Bad2, Float3, Bad3, Float4, Bad4, Float5, Bad5;
     public readonly long Count;
 
-    public EdgeCC(int FirstCycleLength, State[] OtherCycles)
+    public EdgeCC(CycleConfig[] cycles)
     {
-        this.FirstCycle = (FirstCycleLength, (_Perm * _Ori - OtherCycles.Sum(x => x.ori)) % _Ori);
-        this.OtherCycles = OtherCycles;
-        int baseAlgs = OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : 0) + FirstCycleLength - 1;
+        FirstCycle = (cycles[0].perm, cycles[0].ori);
+        OtherCycles = [.. cycles.Skip(1)];
+
+        int baseAlgs = OtherCycles.Sum(x => x.perm > 1 ? x.perm + 1 : 0) + FirstCycle.perm - 1;
         int twistAlgs = (OtherCycles.Count(x => x.perm == 1 && x.ori != 0) + 3) >> 2;
         Parity = baseAlgs & 1;
-        Cycles = OtherCycles.Count(x => x.perm != 1);
+        Breaks = OtherCycles.Count(x => x.perm != 1);
         Float1 = OtherCycles.Count(x => x.perm == 1 && x.ori == 0);
         Bad1 = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
         Float2 = OtherCycles.Count(x => x.perm == 2 && x.ori == 0);
@@ -36,9 +37,9 @@ public class EdgeCC
             Count /= FactI64[i.Count()];
         Algx2 = baseAlgs + (twistAlgs - Float3) * 2;
     }
-    public Edge GetInstance(int Buffer=0)
+    public Edge Realize(int Buffer=0)
     {
-        State[] instance = new State[_Perm];
+        CycleConfig[] instance = new CycleConfig[_Perm];
         int head, remain = FirstCycle.perm, current, i = 0, o = 0;
         int[] perm = RandomPermutation(_Perm), ori = RandomOrientation(_Perm, _Ori);
         current = head = Buffer >> 1;
@@ -74,46 +75,14 @@ public class EdgeCC
     }
 
 #region
-    public static readonly List<EdgeCC> OddList, EvenList;
+    public static readonly List<EdgeCC> OddList = [], EvenList = [];
     public static IEnumerable<EdgeCC> AllList => OddList.Concat(EvenList);
-    private static void GenerateOri(int index, int[] sizes, int[] colors, List<int> indexes)
-    {
-        if (index == sizes.Length)
-        {
-            State[] OtherCycles = new State[sizes.Length];
-            for (int i = 0; i < index; i++)
-                OtherCycles[i] = (sizes[i], colors[i]);
-            var t = new EdgeCC(12 - sizes.Sum(), OtherCycles);
-            (t.Parity == 1 ? OddList : EvenList).Add(t);
-        }
-        else
-        {
-            int j = indexes.IndexOf(index);
-            for (int i = j >= 0 ? 1 : colors[index - 1]; i >= 0; i--)
-            {
-                colors[index] = i;
-                GenerateOri(index + 1, sizes, colors, indexes);
-            }
-        }
-    }
     static EdgeCC()
     {
-        OddList = [];
-        EvenList = [];
-        List<int> temp = [];
-        foreach (var s in GeneratePerm(12))
+        foreach (var config in GenerateCycleConfigs(12, 2))
         {
-            int p = 0;
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i] != p)
-                {
-                    p = s[i];
-                    temp.Add(i);
-                }
-            }
-            GenerateOri(0, s, new int[s.Length], temp);
-            temp.Clear();
+            var cc = new EdgeCC(config);
+            (cc.Parity == 0 ? EvenList : OddList).Add(cc);
         }
     }
 #endregion

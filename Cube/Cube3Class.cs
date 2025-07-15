@@ -52,16 +52,16 @@ class Cube3Class
         {
             double a = rd.NextDouble() * oddEdgeProbability, b = rd.NextDouble() * oddCornerProbability;
             return new Cube3{
-                edge = EdgeCC.OddList[Array.FindIndex(oddEdgeCDF, x => x > a)].GetInstance(),
-                corner = CornerCC.OddList[Array.FindIndex(oddCornerCDF, x => x > b)].GetInstance()
+                edge = EdgeCC.OddList[Array.FindIndex(oddEdgeCDF, x => x > a)].Realize(),
+                corner = CornerCC.OddList[Array.FindIndex(oddCornerCDF, x => x > b)].Realize()
             };
         }
         else
         {
             double a = rd.NextDouble() * evenEdgeProbability, b = rd.NextDouble() * evenCornerProbability;
             return new Cube3{
-                edge = EdgeCC.EvenList[Array.FindIndex(evenEdgeCDF, x => x > a)].GetInstance(),
-                corner = CornerCC.EvenList[Array.FindIndex(evenCornerCDF, x => x > b)].GetInstance()
+                edge = EdgeCC.EvenList[Array.FindIndex(evenEdgeCDF, x => x > a)].Realize(),
+                corner = CornerCC.EvenList[Array.FindIndex(evenCornerCDF, x => x > b)].Realize()
             };
         }
     }

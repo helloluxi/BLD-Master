@@ -5,15 +5,15 @@ using static Cube.Tools;
 namespace Cube;
 public class Edge
 {
-    public State[] state;
+    public CycleConfig[] state;
 
-    public Edge() => state = [.. Enumerable.Range(0, 12).Select(i => new State{ perm = i, ori = 0 })];
-    public State this[int perm, int ori] => new() { perm = state[perm].perm, ori = state[perm].ori ^ ori };
-    public State this[State s] => new() { perm = state[s.perm].perm, ori = state[s.perm].ori ^ s.ori };
+    public Edge() => state = [.. Enumerable.Range(0, 12).Select(i => new CycleConfig{ perm = i, ori = 0 })];
+    public CycleConfig this[int perm, int ori] => new() { perm = state[perm].perm, ori = state[perm].ori ^ ori };
+    public CycleConfig this[CycleConfig s] => new() { perm = state[s.perm].perm, ori = state[s.perm].ori ^ s.ori };
     public static Edge Random()
     {
         int[] perm = RandomPermutation(12), ori = RandomOrientation(12, 2);
-        return new Edge { state = [.. Enumerable.Range(0, 12).Select(i => new State { perm = perm[i], ori = ori[i] })] };
+        return new Edge { state = [.. Enumerable.Range(0, 12).Select(i => new CycleConfig { perm = perm[i], ori = ori[i] })] };
     }
     public Edge Copy() => new() { state = [.. state] };
     public void Solve(){
@@ -116,7 +116,7 @@ public class Edge
         for (int i = 0; i < 12; i++)
             if (state[i].perm == i && state[i].ori == 0)
                 remainBlocks &= ~(1 << i);
-        State head = (Buffer, 0);
+        CycleConfig head = (Buffer, 0);
         while(true){
             var next = this[head];
             // Append cycle middle to code

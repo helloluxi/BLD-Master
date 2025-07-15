@@ -149,7 +149,7 @@ public class Cube4
         char[] state = new char[96];
         for (int i = 0; i < 8; i++)
         {
-            State s = corner[i, 0];
+            CycleConfig s = corner[i, 0];
             state[CornerIndex[i * 3]] = faces[CornerIndex[s.perm * 3 + s.ori] / 16];
             state[CornerIndex[i * 3 + 1]] = faces[CornerIndex[s.perm * 3 + (s.ori + 1) % 3] / 16];
             state[CornerIndex[i * 3 + 2]] = faces[CornerIndex[s.perm * 3 + (s.ori + 2) % 3] / 16];

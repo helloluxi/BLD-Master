@@ -6,7 +6,7 @@ public class WingCC
     public readonly int FirstCycle;
     public readonly int[] OtherCycles;
     public const int _Perm = 24;
-    public readonly int CodeLength, Algx2, Cycles, Parity, Float1, Float2, Float3, Float4, Float5;
+    public readonly int CodeLength, Algx2, Breaks, Parity, Float1, Float2, Float3;
     public readonly Int128 Count;
     public WingCC(int FirstCycle, int[] OtherCycles)
     {
@@ -14,12 +14,10 @@ public class WingCC
         this.OtherCycles = OtherCycles;
         CodeLength = OtherCycles.Sum(x => x > 1 ? x + 1 : 0) + FirstCycle - 1;
         Parity = CodeLength & 1;
-        Cycles = OtherCycles.Count(x => x != 1);
+        Breaks = OtherCycles.Count(x => x != 1);
         Float1 = OtherCycles.Count(x => x == 1);
         Float2 = OtherCycles.Count(x => x == 2);
         Float3 = OtherCycles.Count(x => x == 3);
-        Float4 = OtherCycles.Count(x => x == 4);
-        Float5 = OtherCycles.Count(x => x == 5);
         Count = FactI128[_Perm - 1];
         foreach (var i in OtherCycles)
             Count /= i;
@@ -59,11 +57,11 @@ public class WingCC
 
 
     #region 
-    public static readonly List<WingCC> all;
+    public static readonly List<WingCC> AllList;
     public static readonly Int128 Sum = Int128.Parse("620448401733239439360000");
     static WingCC()
     {
-        all = [.. GeneratePerm(24).Select(s => new WingCC(24 - s.Sum(), s.Clone() as int[]))];
+        AllList = [.. GeneratePerm(24).Select(s => new WingCC(24 - s.Sum(), s.Clone() as int[]))];
     }
     #endregion
 }

@@ -135,13 +135,13 @@ public class Cube3
         char[] state = new char[54];
         for (int i = 0; i < 12; i++)
         {
-            State s = edge[i, 0];
+            CycleConfig s = edge[i, 0];
             state[EdgeIndex[i * 2]] = faces[EdgeIndex[s.perm << 1 | s.ori] / 9];
             state[EdgeIndex[i * 2 + 1]] = faces[EdgeIndex[s.perm << 1 | s.ori ^ 1] / 9];
         }
         for (int i = 0; i < 8; i++)
         {
-            State s = corner[i, 0];
+            CycleConfig s = corner[i, 0];
             state[CornerIndex[i * 3]] = faces[CornerIndex[s.perm * 3 + s.ori] / 9];
             state[CornerIndex[i * 3 + 1]] = faces[CornerIndex[s.perm * 3 + (s.ori + 1) % 3] / 9];
             state[CornerIndex[i * 3 + 2]] = faces[CornerIndex[s.perm * 3 + (s.ori + 2) % 3] / 9];

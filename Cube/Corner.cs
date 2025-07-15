@@ -3,15 +3,15 @@ using static Cube.Tools;
 namespace Cube;
 public class Corner
 {
-    public State[] state;
+    public CycleConfig[] state;
 
-    public Corner() => state = [.. Enumerable.Range(0, 8).Select(i => new State{ perm = i, ori = 0 })];
-    public State this[int perm, int ori] => new() { perm = state[perm].perm, ori = (state[perm].ori + ori) % 3 };
-    public State this[State s] => new() { perm = state[s.perm].perm, ori = (state[s.perm].ori + s.ori) % 3 };
+    public Corner() => state = [.. Enumerable.Range(0, 8).Select(i => new CycleConfig{ perm = i, ori = 0 })];
+    public CycleConfig this[int perm, int ori] => new() { perm = state[perm].perm, ori = (state[perm].ori + ori) % 3 };
+    public CycleConfig this[CycleConfig s] => new() { perm = state[s.perm].perm, ori = (state[s.perm].ori + s.ori) % 3 };
     public static Corner Random()
     {
         int[] perm = RandomPermutation(8), ori = RandomOrientation(8, 3);
-        return new Corner { state = [.. Enumerable.Range(0, 8).Select(i => new State { perm = perm[i], ori = ori[i] })] };
+        return new Corner { state = [.. Enumerable.Range(0, 8).Select(i => new CycleConfig { perm = perm[i], ori = ori[i] })] };
     }
     public Corner Copy() => new() { state = [.. state] };
     public int GetParity(){
@@ -105,7 +105,7 @@ public class Corner
         for (int i = 0; i < 8; i++)
             if (state[i].perm == i && state[i].ori == 0)
                 remainBlocks &= ~(1 << i);
-        State head = (Buffer, 0);
+        CycleConfig head = (Buffer, 0);
         while(true){
             var next = this[head];
             // Append cycle middle to code

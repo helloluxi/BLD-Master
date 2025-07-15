@@ -8,7 +8,7 @@ public class Cube4Class
     public Predicate<WingCC> wingConstraint;
     
     private readonly double[] CornerCDF = new double[CornerCC.EvenList.Count + CornerCC.OddList.Count],
-        WingCDF = new double[WingCC.all.Count];
+        WingCDF = new double[WingCC.AllList.Count];
     public long CornerCount, XCenterCount;
     public Int128 WingCount;
     public double CornerProbability, WingProbability, XCenterProbability;
@@ -30,9 +30,9 @@ public class Cube4Class
         WingCount = 0;
         for (index = 0; index < WingCDF.Length; ++index)
         {
-            if (wingConstraint(WingCC.all[index]))
+            if (wingConstraint(WingCC.AllList[index]))
             {
-                WingCDF[index] = (double)(WingCount += WingCC.all[index].Count) / (double)WingCC.Sum;
+                WingCDF[index] = (double)(WingCount += WingCC.AllList[index].Count) / (double)WingCC.Sum;
             }
         }
         WingProbability = WingCDF[^1];
@@ -47,8 +47,8 @@ public class Cube4Class
     {
         double a = rd.NextDouble() * CornerProbability, b = rd.NextDouble() * WingProbability;
         return new Cube4{
-            corner = CornerCC.AllList[Array.FindIndex(CornerCDF, x => x > a)].GetInstance(),
-            wing = WingCC.all[Array.FindIndex(WingCDF, x => x > b)].GetInstance(),
+            corner = CornerCC.AllList[Array.FindIndex(CornerCDF, x => x > a)].Realize(),
+            wing = WingCC.AllList[Array.FindIndex(WingCDF, x => x > b)].GetInstance(),
             xcenter = XCenterCC.GetInstance(scrambleXCenter)
         };
     }
