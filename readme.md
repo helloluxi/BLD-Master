@@ -1,6 +1,6 @@
 # BLD-Master
 
-> **Warning:** This repository is no longer maintained. Please use [3BLD Stat Tools](https://github.com/helloluxi/bld-stat) and [3BLD Scrambler](https://github.com/helloluxi/bld-scr).
+> **Warning:** This repository is no longer maintained. Please use [3BLD Scrambler](https://github.com/helloluxi/bld-scr).
 
 ## Acknowledgements
 

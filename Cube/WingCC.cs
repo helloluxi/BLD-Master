@@ -6,7 +6,7 @@ public class WingCC
     public readonly int FirstCycle;
     public readonly int[] OtherCycles;
     public const int _Perm = 24;
-    public readonly int CodeLength, Algx2, Breaks, Parity, Float1, Float2, Float3;
+    public readonly int CodeLength, Algx2, Breaks, Parity, Closed1, Closed2, Closed3;
     public readonly Int128 Count;
     public WingCC(int FirstCycle, int[] OtherCycles)
     {
@@ -15,15 +15,15 @@ public class WingCC
         CodeLength = OtherCycles.Sum(x => x > 1 ? x + 1 : 0) + FirstCycle - 1;
         Parity = CodeLength & 1;
         Breaks = OtherCycles.Count(x => x != 1);
-        Float1 = OtherCycles.Count(x => x == 1);
-        Float2 = OtherCycles.Count(x => x == 2);
-        Float3 = OtherCycles.Count(x => x == 3);
+        Closed1 = OtherCycles.Count(x => x == 1);
+        Closed2 = OtherCycles.Count(x => x == 2);
+        Closed3 = OtherCycles.Count(x => x == 3);
         Count = FactI128[_Perm - 1];
         foreach (var i in OtherCycles)
             Count /= i;
         foreach (var i in OtherCycles.GroupBy(x => x))
             Count /= FactI128[i.Count()];
-        Algx2 = CodeLength - Float3 * 2;
+        Algx2 = CodeLength - Closed3 * 2;
     }
     public Wing GetInstance(int Buffer=0)
     {

@@ -5,7 +5,8 @@ public class CornerCC {
     public readonly CycleConfig[] OtherCycles;
     private const int _Perm = 8, _Ori = 3;
     public const long Sum = 88179840;
-    public readonly int Algx2, Breaks, Parity, Float1, Bad1, Float2, Bad2, Float3, Bad3, Float4, Bad4, Float5, Bad5;
+    public readonly int Algx2, Breaks, Parity, Closed1, Open1, CwTwist, CcwTwist, Closed2, Open2, Closed3, Open3;
+    public readonly int AlgFFx2, AlgFFPx2;
     public readonly int Count;
     public CornerCC(CycleConfig[] cycles)
     {
@@ -39,23 +40,57 @@ public class CornerCC {
             twistAlgs++;
         }
         Breaks = OtherCycles.Count(x => x.perm != 1);
-        Float1 = OtherCycles.Count(x => x.perm == 1 && x.ori == 0);
-        Bad1   = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
-        Float2 = OtherCycles.Count(x => x.perm == 2 && x.ori == 0);
-        Bad2   = OtherCycles.Count(x => x.perm == 2 && x.ori > 0);
-        Float3 = OtherCycles.Count(x => x.perm == 3 && x.ori == 0);
-        Bad3   = OtherCycles.Count(x => x.perm == 3 && x.ori > 0);
-        Float4 = OtherCycles.Count(x => x.perm == 4 && x.ori == 0);
-        Bad4   = OtherCycles.Count(x => x.perm == 4 && x.ori > 0);
-        Float5 = OtherCycles.Count(x => x.perm == 5 && x.ori == 0);
-        Bad5   = OtherCycles.Count(x => x.perm == 5 && x.ori > 0);
+        Closed1  = OtherCycles.Count(x => x.perm == 1 && x.ori == 0);
+        Open1    = OtherCycles.Count(x => x.perm == 1 && x.ori > 0);
+        CwTwist  = OtherCycles.Count(x => x.perm == 1 && x.ori == 1);
+        CcwTwist = OtherCycles.Count(x => x.perm == 1 && x.ori == 2);
+        Closed2 = OtherCycles.Count(x => x.perm == 2 && x.ori == 0);
+        Open2   = OtherCycles.Count(x => x.perm == 2 && x.ori > 0);
+        Closed3 = OtherCycles.Count(x => x.perm == 3 && x.ori == 0);
+        Open3   = OtherCycles.Count(x => x.perm == 3 && x.ori > 0);
         Count = FactI[_Perm - 1];
         foreach (var i in OtherCycles)
             Count /= i.perm;
         Count *= Pow3[_Perm - 1 - OtherCycles.Length];
         foreach (var i in OtherCycles.GroupBy(x => x))
             Count /= FactI[i.Count()];
-        Algx2 = baseAlgs + (twistAlgs - Float3) * 2;
+        Algx2 = baseAlgs + (twistAlgs - Closed3) * 2;
+
+        int p0 = FirstCycle.perm;
+        int algFF = 0, r20 = 0, r21 = 0, r22 = 0, r11 = 0, r12 = 0;
+        foreach (var cycle in OtherCycles)
+        {
+            int p = cycle.perm, o = cycle.ori;
+            if (p >= 3)
+            {
+                algFF += (p - 1) / 2;
+                p = p % 2 == 0 ? 2 : 1;
+            }
+            if (p == 2)
+            {
+                if (o == 0) r20++;
+                else if (o == 1) r21++;
+                else r22++;
+            }
+            else if (p == 1)
+            {
+                if (o == 1) r11++;
+                else if (o == 2) r12++;
+            }
+        }
+        algFF += r20 >> 1 << 1; r20 %= 2;
+        int mp = Math.Min(r21, r22); algFF += mp * 2; r21 -= mp; r22 -= mp;
+        algFF += r21 >> 1 << 1; r12 += r21 >> 1; r21 %= 2;
+        algFF += r22 >> 1 << 1; r12 += r22 >> 1; r22 %= 2;
+        int mp1 = Math.Min(r20, r21); algFF += mp1 * 2; r20 -= mp1; r21 -= mp1; r11 += mp1;
+        int mp2 = Math.Min(r20, r22); algFF += mp2 * 2; r20 -= mp2; r22 -= mp2; r12 += mp2;
+        algFF += r11 / 3; r11 %= 3;
+        algFF += r12 / 3; r12 %= 3;
+        algFF += (r11 + r12 + 2) / 3;
+        AlgFFx2 = 2 * algFF + 3 * (r20 + r21 + r22) + (p0 - 1);
+        AlgFFPx2 = Parity == 1
+            ? 2 * algFF + r20 + 3 * (r21 + r22) + (p0 - 1)
+            : AlgFFx2;
     }
     public Corner Realize(int Buffer=0)
     {
